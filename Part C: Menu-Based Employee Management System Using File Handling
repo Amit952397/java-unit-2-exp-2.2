@@ -1,0 +1,146 @@
+Employee Class:
+import java.io.Serializable;
+
+public class Employee implements Serializable {
+    private int id;
+    private String name;
+    private String designation;
+    private double salary;
+
+    public Employee(int id, String name, String designation, double salary) {
+        this.id = id;
+        this.name = name;
+        this.designation = designation;
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee ID: " + id + ", Name: " + name +
+               ", Designation: " + designation + ", Salary: " + salary;
+    }
+}
+Main Menu Program:
+import java.io.*;
+import java.util.*;
+
+public class EmployeeManagementSystem {
+    private static final String FILE_NAME = "employees.dat";
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n--- Employee Management System ---");
+            System.out.println("1. Add Employee");
+            System.out.println("2. Display All Employees");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = sc.nextInt();
+            sc.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    addEmployee(sc);
+                    break;
+                case 2:
+                    displayEmployees();
+                    break;
+                case 3:
+                    System.out.println("Exiting the program...");
+                    break;
+                default:
+                    System.out.println("Invalid choice! Try again.");
+            }
+        } while (choice != 3);
+
+        sc.close();
+    }
+
+    // Method to add an employee
+    private static void addEmployee(Scanner sc) {
+        System.out.print("Enter Employee ID: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print("Enter Employee Name: ");
+        String name = sc.nextLine();
+
+        System.out.print("Enter Employee Designation: ");
+        String designation = sc.nextLine();
+
+        System.out.print("Enter Employee Salary: ");
+        double salary = sc.nextDouble();
+
+        Employee emp = new Employee(id, name, designation, salary);
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(FILE_NAME, true)) {
+
+            // Handle appending objects without corrupting file
+            if (new File(FILE_NAME).length() == 0) {
+                oos.writeObject(emp);
+            } else {
+                // Append manually
+                AppendableObjectOutputStream aos = new AppendableObjectOutputStream(new FileOutputStream(FILE_NAME, true));
+                aos.writeObject(emp);
+                aos.close();
+            }
+            System.out.println("Employee added successfully!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to display all employees
+    private static void displayEmployees() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            System.out.println("\n--- Employee Records ---");
+
+            while (true) {
+                Employee emp = (Employee) ois.readObject();
+                System.out.println(emp);
+            }
+        } catch (EOFException e) {
+            System.out.println("End of file reached.");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+// Helper class to prevent header corruption during append
+class AppendableObjectOutputStream extends ObjectOutputStream {
+    public AppendableObjectOutputStream(OutputStream out) throws IOException {
+        super(out);
+    }
+
+    @Override
+    protected void writeStreamHeader() throws IOException {
+        reset();
+    }
+}
+
+output
+--- Employee Management System ---
+1. Add Employee
+2. Display All Employees
+3. Exit
+Enter your choice: 1
+Enter Employee ID: 101
+Enter Employee Name: John
+Enter Employee Designation: Manager
+Enter Employee Salary: 75000
+Employee added successfully!
+
+--- Employee Management System ---
+1. Add Employee
+2. Display All Employees
+3. Exit
+Enter your choice: 2
+
+--- Employee Records ---
+Employee ID: 101, Name: John, Designation: Manager, Salary: 75000.0
+End of file reached.
