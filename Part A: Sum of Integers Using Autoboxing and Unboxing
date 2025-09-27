@@ -28,3 +28,10 @@ public class SumOfIntegers {
         sc.close();
     }
 }
+
+output 
+
+Enter integers separated by spaces:
+10 20 30 40
+The sum of integers is: 100
+
