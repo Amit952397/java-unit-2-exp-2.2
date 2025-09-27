@@ -47,3 +47,10 @@ public class StudentSerialization {
         }
     }
 }
+
+output'
+
+Student object has been serialized to student.ser
+Deserialized Student Data:
+Student ID: 101, Name: Amit Kumar, Grade: 89.5
+
